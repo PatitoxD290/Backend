@@ -338,7 +338,7 @@ INSERT INTO `producto` (`id_producto`, `producto`, `descripcion`, `precio`, `cos
 (1, 'Short Deportivo', 'Ideal para entrenamientos y actividades físicas. Confeccionado en tela liviana, transpirable y de secado rápido para máxima comodidad.', 25.00, 20.00, 2, 'Algodón', 'Disponible'),
 (2, 'Polo Deportivo', 'Diseñado para el deporte y la movilidad. Hecho con materiales elásticos que permiten libertad de movimiento y absorción del sudor.', 35.00, 30.00, 2, 'Algodón', 'Disponible'),
 (3, 'Conjunto Deportivo', 'Conjunto completo de polo y short, perfecto para deportes o actividades escolares. Comodidad y estilo en una sola prenda.', 55.00, 50.00, 2, 'Algodón', 'Disponible'),
-(4, 'Short De Vestir', 'Corte moderno y elegante, perfecto para eventos formales o escolares. Tela resistente con acabado fino.', 20.00, 15.00, 4, 'Algodón', 'Disponible'),
+(4, 'Short De Vestir', 'Corte moderno y elegante, perfecto para eventos formales o escolares. Tela resistente con acabado fino.', 22.00, 15.00, 4, 'Algodón', 'Disponible'),
 (5, 'Polo De Vestir', 'Estilo clásico para uniformes escolares o institucionales. Su tejido suave garantiza comodidad durante todo el día.', 30.00, 25.00, 4, 'Algodón', 'Disponible'),
 (6, 'Polo Estudiantil', 'Prenda básica para el uniforme escolar, con cuello clásico y costuras reforzadas. Resistente al uso diario y fácil de lavar.', 40.00, 30.00, 1, 'Algodón', 'Disponible'),
 (7, 'Camisa Estudiantil', 'Camisa formal para uniforme escolar. Corte estructurado y tela fresca, ideal para mantener una apariencia pulcra.', 45.00, 35.00, 1, 'Algodón', 'Disponible'),
