@@ -18,6 +18,6 @@ router.post("/verify-code", verifyCode);
 router.post("/codigo-pago",verifyToken, codigoPago);
 
 // ✅ Nueva ruta para verificar el código de pago simulado
-router.post("/verificar-pago", verificarPago);
+router.post("/verificar-pago", verifyToken, verificarPago);
 
 module.exports = router;

@@ -16,6 +16,7 @@ router.put("/clientes/:id", verifyToken, clienteController.updateCliente);
 router.get("/contratos", verifyToken, clienteController.listarTodosContratos);
 
 // Datos de boleta del cliente
-router.get("/clientes-boleta/:id", verifyToken, clienteController.datosBoletaCliente);
+router.get("/clientes-boleta/:id", clienteController.datosBoletaCliente);
+
 
 module.exports = router;

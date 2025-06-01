@@ -114,7 +114,7 @@ const codigoPago = async (req, res) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: email,
-    subject: "Código de pago simulado",
+    subject: "El codigo de tu pago es:",
     text: `Tu código de pago es: ${codigo}`,
     html: `<h1>Tu código de pago es: <strong>${codigo}</strong></h1>`,
   };
