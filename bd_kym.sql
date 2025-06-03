@@ -111,6 +111,18 @@ CREATE TABLE IF NOT EXISTS ventas_detalle_Log (
     Fecha DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tabla de logs para registrar cambios en la tabla comprasusuario
+CREATE TABLE IF NOT EXISTS comprasusuario_log (
+    Id_log INT PRIMARY KEY AUTO_INCREMENT,
+    Tipo CHAR(1), -- 'I' = Insert, 'U' = Update, 'D' = Delete
+    Tabla VARCHAR(50),
+    Registro INT, -- id_comprasusuario
+    Campo VARCHAR(50),
+    ValorAntes VARCHAR(255),
+    ValorDespues VARCHAR(255),
+    Fecha DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Estructura de tabla para la tabla `categoria`
 CREATE TABLE IF NOT EXISTS `categoria` (
   `id_categoria` INT(11) NOT NULL AUTO_INCREMENT,
@@ -212,62 +224,6 @@ BEGIN
 END $$
 
 DELIMITER ;
-
--- Estructura de tabla para la tabla `contrato`
-CREATE TABLE IF NOT EXISTS `contrato` (
-  `id_contrato` INT(11) NOT NULL AUTO_INCREMENT,
-  `descripcion` TEXT NOT NULL,
-  `id_cliente` INT(11) DEFAULT NULL,
-  `referencia_diseño` VARCHAR(50) DEFAULT NULL,
-  `estado` ENUM('Activo','Pendiente','Finalizado','Rechazado') DEFAULT NULL,
-  `fecha_inicio` DATE NOT NULL,
-  PRIMARY KEY (`id_contrato`),
-  FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id_cliente`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-DELIMITER $$
-
-CREATE TRIGGER trContratoInsert
-AFTER INSERT ON contrato
-FOR EACH ROW
-BEGIN
-    INSERT INTO contrato_log (Tipo, Tabla, Registro, Campo, ValorAntes, ValorDespues, Fecha) VALUES
-    ('I', 'contrato', NEW.id_contrato, 'id_contrato', NULL, CAST(NEW.id_contrato AS CHAR), NOW()),
-    ('I', 'contrato', NEW.id_contrato, 'descripcion', NULL, NEW.descripcion, NOW()),
-    ('I', 'contrato', NEW.id_contrato, 'id_cliente', NULL, CAST(NEW.id_cliente AS CHAR), NOW()),
-    ('I', 'contrato', NEW.id_contrato, 'referencia_diseño', NULL, NEW.referencia_diseño, NOW()),
-    ('I', 'contrato', NEW.id_contrato, 'estado', NULL, NEW.estado, NOW()),
-    ('I', 'contrato', NEW.id_contrato, 'fecha_inicio', NULL, CAST(NEW.fecha_inicio AS CHAR), NOW());
-END $$
-
-CREATE TRIGGER trContratoUpdate
-AFTER UPDATE ON contrato
-FOR EACH ROW
-BEGIN
-    INSERT INTO contrato_log (Tipo, Tabla, Registro, Campo, ValorAntes, ValorDespues, Fecha) VALUES
-    ('U', 'contrato', OLD.id_contrato, 'id_contrato', CAST(OLD.id_contrato AS CHAR), CAST(NEW.id_contrato AS CHAR), NOW()),
-    ('U', 'contrato', OLD.id_contrato, 'descripcion', OLD.descripcion, NEW.descripcion, NOW()),
-    ('U', 'contrato', OLD.id_contrato, 'id_cliente', CAST(OLD.id_cliente AS CHAR), CAST(NEW.id_cliente AS CHAR), NOW()),
-    ('U', 'contrato', OLD.id_contrato, 'referencia_diseño', OLD.referencia_diseño, NEW.referencia_diseño, NOW()),
-    ('U', 'contrato', OLD.id_contrato, 'estado', OLD.estado, NEW.estado, NOW()),
-    ('U', 'contrato', OLD.id_contrato, 'fecha_inicio', CAST(OLD.fecha_inicio AS CHAR), CAST(NEW.fecha_inicio AS CHAR), NOW());
-END $$
-
-CREATE TRIGGER trContratoDelete
-AFTER DELETE ON contrato
-FOR EACH ROW
-BEGIN
-    INSERT INTO contrato_log (Tipo, Tabla, Registro, Campo, ValorAntes, ValorDespues, Fecha) VALUES
-    ('D', 'contrato', OLD.id_contrato, 'id_contrato', CAST(OLD.id_contrato AS CHAR), NULL, NOW()),
-    ('D', 'contrato', OLD.id_contrato, 'descripcion', OLD.descripcion, NULL, NOW()),
-    ('D', 'contrato', OLD.id_contrato, 'id_cliente', CAST(OLD.id_cliente AS CHAR), NULL, NOW()),
-    ('D', 'contrato', OLD.id_contrato, 'referencia_diseño', OLD.referencia_diseño, NULL, NOW()),
-    ('D', 'contrato', OLD.id_contrato, 'estado', OLD.estado, NULL, NOW()),
-    ('D', 'contrato', OLD.id_contrato, 'fecha_inicio', CAST(OLD.fecha_inicio AS CHAR), NULL, NOW());
-END $$
-
-DELIMITER ;
-
 
 -- Estructura de tabla para la tabla `producto`
 CREATE TABLE IF NOT EXISTS `producto` (
@@ -504,6 +460,60 @@ END $$
 
 DELIMITER ;
 
+-- Estructura de tabla para la tabla `contrato`
+CREATE TABLE IF NOT EXISTS `contrato` (
+  `id_contrato` INT(11) NOT NULL AUTO_INCREMENT,
+  `descripcion` TEXT NOT NULL,
+  `id_usuario` INT(11) DEFAULT NULL,
+  `referencia_diseño` VARCHAR(50) DEFAULT NULL,
+  `estado` ENUM('Activo','Pendiente','Finalizado','Rechazado') DEFAULT NULL,
+  `fecha_inicio` DATE NOT NULL,
+  PRIMARY KEY (`id_contrato`),
+  FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DELIMITER $$
+
+CREATE TRIGGER trContratoInsert
+AFTER INSERT ON contrato
+FOR EACH ROW
+BEGIN
+    INSERT INTO contrato_log (Tipo, Tabla, Registro, Campo, ValorAntes, ValorDespues, Fecha) VALUES
+    ('I', 'contrato', NEW.id_contrato, 'id_contrato', NULL, CAST(NEW.id_contrato AS CHAR), NOW()),
+    ('I', 'contrato', NEW.id_contrato, 'descripcion', NULL, NEW.descripcion, NOW()),
+    ('I', 'contrato', NEW.id_contrato, 'id_usuario', NULL, CAST(NEW.id_usuario AS CHAR), NOW()),
+    ('I', 'contrato', NEW.id_contrato, 'referencia_diseño', NULL, NEW.referencia_diseño, NOW()),
+    ('I', 'contrato', NEW.id_contrato, 'estado', NULL, NEW.estado, NOW()),
+    ('I', 'contrato', NEW.id_contrato, 'fecha_inicio', NULL, CAST(NEW.fecha_inicio AS CHAR), NOW());
+END $$
+
+CREATE TRIGGER trContratoUpdate
+AFTER UPDATE ON contrato
+FOR EACH ROW
+BEGIN
+    INSERT INTO contrato_log (Tipo, Tabla, Registro, Campo, ValorAntes, ValorDespues, Fecha) VALUES
+    ('U', 'contrato', OLD.id_contrato, 'id_contrato', CAST(OLD.id_contrato AS CHAR), CAST(NEW.id_contrato AS CHAR), NOW()),
+    ('U', 'contrato', OLD.id_contrato, 'descripcion', OLD.descripcion, NEW.descripcion, NOW()),
+    ('U', 'contrato', OLD.id_contrato, 'id_usuario', CAST(OLD.id_usuario AS CHAR), CAST(NEW.id_usuario AS CHAR), NOW()),
+    ('U', 'contrato', OLD.id_contrato, 'referencia_diseño', OLD.referencia_diseño, NEW.referencia_diseño, NOW()),
+    ('U', 'contrato', OLD.id_contrato, 'estado', OLD.estado, NEW.estado, NOW()),
+    ('U', 'contrato', OLD.id_contrato, 'fecha_inicio', CAST(OLD.fecha_inicio AS CHAR), CAST(NEW.fecha_inicio AS CHAR), NOW());
+END $$
+
+CREATE TRIGGER trContratoDelete
+AFTER DELETE ON contrato
+FOR EACH ROW
+BEGIN
+    INSERT INTO contrato_log (Tipo, Tabla, Registro, Campo, ValorAntes, ValorDespues, Fecha) VALUES
+    ('D', 'contrato', OLD.id_contrato, 'id_contrato', CAST(OLD.id_contrato AS CHAR), NULL, NOW()),
+    ('D', 'contrato', OLD.id_contrato, 'descripcion', OLD.descripcion, NULL, NOW()),
+    ('D', 'contrato', OLD.id_contrato, 'id_usuario', CAST(OLD.id_usuario AS CHAR), NULL, NOW()),
+    ('D', 'contrato', OLD.id_contrato, 'referencia_diseño', OLD.referencia_diseño, NULL, NOW()),
+    ('D', 'contrato', OLD.id_contrato, 'estado', OLD.estado, NULL, NOW()),
+    ('D', 'contrato', OLD.id_contrato, 'fecha_inicio', CAST(OLD.fecha_inicio AS CHAR), NULL, NOW());
+END $$
+
+DELIMITER ;
 
 -- Estructura de tabla para la tabla `ventas`
 CREATE TABLE IF NOT EXISTS `ventas` (
@@ -572,6 +582,7 @@ CREATE TABLE IF NOT EXISTS `ventas_detalle` (
   `id_ventas_detalle` INT(11) NOT NULL AUTO_INCREMENT,
   `id_ventas` INT(11) NOT NULL,
   `id_producto` INT(11) NOT NULL,
+  `tallas` VARCHAR(11) NOT NULL,
   `cantidad` INT(11) NOT NULL,
   PRIMARY KEY (`id_ventas_detalle`),
   FOREIGN KEY (`id_ventas`) REFERENCES `ventas` (`id_ventas`),
@@ -580,6 +591,9 @@ CREATE TABLE IF NOT EXISTS `ventas_detalle` (
 
 DELIMITER $$
 
+DELIMITER $$
+
+-- 🔵 AFTER INSERT
 CREATE TRIGGER trVentasDetalleInsert
 AFTER INSERT ON ventas_detalle
 FOR EACH ROW
@@ -588,9 +602,11 @@ BEGIN
     ('I', 'ventas_detalle', NEW.id_ventas_detalle, 'id_ventas_detalle', NULL, CAST(NEW.id_ventas_detalle AS CHAR), NOW()),
     ('I', 'ventas_detalle', NEW.id_ventas_detalle, 'id_ventas', NULL, CAST(NEW.id_ventas AS CHAR), NOW()),
     ('I', 'ventas_detalle', NEW.id_ventas_detalle, 'id_producto', NULL, CAST(NEW.id_producto AS CHAR), NOW()),
+    ('I', 'ventas_detalle', NEW.id_ventas_detalle, 'tallas', NULL, NEW.tallas, NOW()),
     ('I', 'ventas_detalle', NEW.id_ventas_detalle, 'cantidad', NULL, CAST(NEW.cantidad AS CHAR), NOW());
 END $$
 
+-- 🟠 AFTER UPDATE
 CREATE TRIGGER trVentasDetalleUpdate
 AFTER UPDATE ON ventas_detalle
 FOR EACH ROW
@@ -599,9 +615,11 @@ BEGIN
     ('U', 'ventas_detalle', OLD.id_ventas_detalle, 'id_ventas_detalle', CAST(OLD.id_ventas_detalle AS CHAR), CAST(NEW.id_ventas_detalle AS CHAR), NOW()),
     ('U', 'ventas_detalle', OLD.id_ventas_detalle, 'id_ventas', CAST(OLD.id_ventas AS CHAR), CAST(NEW.id_ventas AS CHAR), NOW()),
     ('U', 'ventas_detalle', OLD.id_ventas_detalle, 'id_producto', CAST(OLD.id_producto AS CHAR), CAST(NEW.id_producto AS CHAR), NOW()),
+    ('U', 'ventas_detalle', OLD.id_ventas_detalle, 'tallas', OLD.tallas, NEW.tallas, NOW()),
     ('U', 'ventas_detalle', OLD.id_ventas_detalle, 'cantidad', CAST(OLD.cantidad AS CHAR), CAST(NEW.cantidad AS CHAR), NOW());
 END $$
 
+-- 🔴 AFTER DELETE
 CREATE TRIGGER trVentasDetalleDelete
 AFTER DELETE ON ventas_detalle
 FOR EACH ROW
@@ -610,7 +628,72 @@ BEGIN
     ('D', 'ventas_detalle', OLD.id_ventas_detalle, 'id_ventas_detalle', CAST(OLD.id_ventas_detalle AS CHAR), NULL, NOW()),
     ('D', 'ventas_detalle', OLD.id_ventas_detalle, 'id_ventas', CAST(OLD.id_ventas AS CHAR), NULL, NOW()),
     ('D', 'ventas_detalle', OLD.id_ventas_detalle, 'id_producto', CAST(OLD.id_producto AS CHAR), NULL, NOW()),
+    ('D', 'ventas_detalle', OLD.id_ventas_detalle, 'tallas', OLD.tallas, NULL, NOW()),
     ('D', 'ventas_detalle', OLD.id_ventas_detalle, 'cantidad', CAST(OLD.cantidad AS CHAR), NULL, NOW());
 END $$
 
 DELIMITER ;
+
+
+-- Tabla principal: relación de usuarios con ventas
+CREATE TABLE IF NOT EXISTS `comprasusuario` (
+  `id_comprasusuario` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_usuario` INT(11),
+  `id_ventas` INT(11),
+  PRIMARY KEY (`id_comprasusuario`),
+  FOREIGN KEY (`id_ventas`) REFERENCES `ventas` (`id_ventas`),
+  FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Cambio de delimitador para definir triggers
+DELIMITER $$
+
+-- Trigger para INSERT
+CREATE TRIGGER trComprasUsuarioInsert
+AFTER INSERT ON comprasusuario
+FOR EACH ROW
+BEGIN
+    INSERT INTO comprasusuario_log (Tipo, Tabla, Registro, Campo, ValorAntes, ValorDespues, Fecha) VALUES
+    ('I', 'comprasusuario', NEW.id_comprasusuario, 'id_comprasusuario', NULL, CAST(NEW.id_comprasusuario AS CHAR), NOW()),
+    ('I', 'comprasusuario', NEW.id_comprasusuario, 'id_usuario', NULL, CAST(NEW.id_usuario AS CHAR), NOW()),
+    ('I', 'comprasusuario', NEW.id_comprasusuario, 'id_ventas', NULL, CAST(NEW.id_ventas AS CHAR), NOW());
+END$$
+
+-- Trigger para UPDATE
+CREATE TRIGGER trComprasUsuarioUpdate
+AFTER UPDATE ON comprasusuario
+FOR EACH ROW
+BEGIN
+    IF OLD.id_comprasusuario <> NEW.id_comprasusuario THEN
+        INSERT INTO comprasusuario_log (Tipo, Tabla, Registro, Campo, ValorAntes, ValorDespues, Fecha)
+        VALUES ('U', 'comprasusuario', OLD.id_comprasusuario, 'id_comprasusuario', 
+                CAST(OLD.id_comprasusuario AS CHAR), CAST(NEW.id_comprasusuario AS CHAR), NOW());
+    END IF;
+
+    IF OLD.id_usuario <> NEW.id_usuario THEN
+        INSERT INTO comprasusuario_log (Tipo, Tabla, Registro, Campo, ValorAntes, ValorDespues, Fecha)
+        VALUES ('U', 'comprasusuario', OLD.id_comprasusuario, 'id_usuario', 
+                CAST(OLD.id_usuario AS CHAR), CAST(NEW.id_usuario AS CHAR), NOW());
+    END IF;
+
+    IF OLD.id_ventas <> NEW.id_ventas THEN
+        INSERT INTO comprasusuario_log (Tipo, Tabla, Registro, Campo, ValorAntes, ValorDespues, Fecha)
+        VALUES ('U', 'comprasusuario', OLD.id_comprasusuario, 'id_ventas', 
+                CAST(OLD.id_ventas AS CHAR), CAST(NEW.id_ventas AS CHAR), NOW());
+    END IF;
+END$$
+
+-- Trigger para DELETE
+CREATE TRIGGER trComprasUsuarioDelete
+AFTER DELETE ON comprasusuario
+FOR EACH ROW
+BEGIN
+    INSERT INTO comprasusuario_log (Tipo, Tabla, Registro, Campo, ValorAntes, ValorDespues, Fecha) VALUES
+    ('D', 'comprasusuario', OLD.id_comprasusuario, 'id_comprasusuario', CAST(OLD.id_comprasusuario AS CHAR), NULL, NOW()),
+    ('D', 'comprasusuario', OLD.id_comprasusuario, 'id_usuario', CAST(OLD.id_usuario AS CHAR), NULL, NOW()),
+    ('D', 'comprasusuario', OLD.id_comprasusuario, 'id_ventas', CAST(OLD.id_ventas AS CHAR), NULL, NOW());
+END$$
+
+-- Restaurar delimitador
+DELIMITER ;
+

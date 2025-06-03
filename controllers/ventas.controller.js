@@ -1,17 +1,30 @@
 const db = require("../config/database");
 
 exports.createVenta = async (req, res) => {
-  const { id_cliente, lugar_entrega, total, forma_pago, fecha, hora, detalles } = req.body;
+  const { id_usuario, id_cliente, lugar_entrega, total, forma_pago, fecha, hora, detalles } = req.body;
 
-  if (!lugar_entrega || !total || !forma_pago || !fecha || !hora || !Array.isArray(detalles) || detalles.length === 0) {
-    return res.status(400).json({ error: "Todos los campos son obligatorios y debe incluir al menos un detalle" });
+  // Validar campos obligatorios
+  if (
+    !id_usuario ||
+    !lugar_entrega ||
+    !total ||
+    !forma_pago ||
+    !fecha ||
+    !hora ||
+    !Array.isArray(detalles) ||
+    detalles.length === 0
+  ) {
+    return res.status(400).json({
+      error: "Todos los campos son obligatorios, incluyendo id_usuario y al menos un detalle",
+    });
   }
 
-  const connection = db; // 👈 usa directamente db
+  const connection = db;
 
   try {
-    await connection.beginTransaction(); // ✅
+    await connection.beginTransaction();
 
+    // Insertar en ventas
     const [result] = await connection.query(
       "INSERT INTO ventas (id_cliente, lugar_entrega, total, forma_pago, fecha, hora) VALUES (?, ?, ?, ?, ?, ?)",
       [id_cliente || null, lugar_entrega, total, forma_pago, fecha, hora]
@@ -19,11 +32,23 @@ exports.createVenta = async (req, res) => {
 
     const id_ventas = result.insertId;
 
-    const valoresDetalle = detalles.map(({ id_producto, cantidad }) => [id_ventas, id_producto, cantidad]);
+    // Insertar detalles, incluyendo tallas (string tipo 's,m,l')
+    const valoresDetalle = detalles.map(({ id_producto, cantidad, tallas }) => [
+      id_ventas,
+      id_producto,
+      tallas || "", // si no viene tallas, poner cadena vacía
+      cantidad,
+    ]);
 
     await connection.query(
-      "INSERT INTO ventas_detalle (id_ventas, id_producto, cantidad) VALUES ?",
+      "INSERT INTO ventas_detalle (id_ventas, id_producto, tallas, cantidad) VALUES ?",
       [valoresDetalle]
+    );
+
+    // Insertar en comprasusuario con id_usuario
+    await connection.query(
+      "INSERT INTO comprasusuario (id_usuario, id_ventas) VALUES (?, ?)",
+      [id_usuario, id_ventas]
     );
 
     await connection.commit();
@@ -35,6 +60,7 @@ exports.createVenta = async (req, res) => {
     res.status(500).json({ error: "Error al registrar la venta y detalles", detalle: err.message });
   }
 };
+
 
 // Obtener todas las ventas
 exports.getVentas = async (_req, res) => {
@@ -127,5 +153,16 @@ exports.obtenerProductosMasVendidos = async (_req, res) => {
   } catch (err) {
     console.error("Error al obtener productos más vendidos:", err);
     res.status(500).json({ error: "Error al obtener productos más vendidos" });
+  }
+};
+
+// Obtener todas las compras del usuario
+exports.getComprasUsuario = async (_req, res) => {
+  try {
+    const [results] = await db.query("SELECT * FROM comprasusuario");
+    res.status(200).json(results);
+  } catch (err) {
+    console.error("Error al obtener ventas:", err);
+    res.status(500).json({ error: "Error en la base de datos" });
   }
 };

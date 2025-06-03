@@ -11,6 +11,7 @@ const ventasRoutes = require("./routes/ventas.routes");
 const productoRoutes = require("./routes/producto.routes");
 const contratoRoutes = require("./routes/contrato.routes");
 const stockRoutes = require("./routes/stock.routes");
+const compraUsuarioRoutes = require("./routes/comprausuario.routes");
 const logsRoutes = require("./routes/logs.routes");
 const millerRoutes = require("./routes/miller.routes.js");
 
@@ -60,6 +61,7 @@ app.use("/api/v1", ventasRoutes);
 app.use("/api/v1", productoRoutes);
 app.use("/api/v1", contratoRoutes);
 app.use("/api/v1", stockRoutes);
+app.use("/api/v1", compraUsuarioRoutes);
 app.use("/api/v1", logsRoutes);
 app.use("/api/v1", millerRoutes); 
 
