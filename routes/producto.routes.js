@@ -3,14 +3,18 @@ const router = express.Router();
 const productoController = require("../controllers/producto.controller");
 const { verifyToken } = require("../middlewares/auth.middleware");
 
-// Rutas CRUD básicas
+// Crear y actualizar productos
 router.post("/productos", verifyToken, productoController.createProducto);
 router.put("/productos/:id", verifyToken, productoController.updateProducto);
+
+// Obtener todos los productos y por ID
+router.get("/productos", verifyToken, productoController.getAllProductos);
+router.get("/productos/:id", verifyToken, productoController.getProductoById);
 
 // Obtener stock total por producto
 router.get("/productos-stock/:id", verifyToken, productoController.getProductoConTotalStock);
 
-// Catálogo de productos
+// Catálogo público
 router.get("/productos-catalogo", productoController.getCatalogoProductos);
 
 module.exports = router;

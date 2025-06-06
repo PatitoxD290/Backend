@@ -40,6 +40,65 @@ exports.updateProducto = async (req, res) => {
   }
 };
 
+// Obtener todos los productos
+exports.getAllProductos = async (req, res) => {
+  const query = `
+    SELECT 
+      p.id_producto,
+      p.producto,
+      p.descripcion,
+      p.precio,
+      p.costo,
+      p.id_categoria,
+      c.categoria,
+      p.material,
+      p.estado
+    FROM producto p
+    JOIN categoria c ON p.id_categoria = c.id_categoria
+    ORDER BY p.id_producto DESC
+  `;
+
+  try {
+    const [results] = await db.query(query);
+    res.status(200).json(results);
+  } catch (err) {
+    res.status(500).json({ error: "Error al obtener productos" });
+  }
+};
+
+// Obtener un producto por ID
+exports.getProductoById = async (req, res) => {
+  const { id } = req.params;
+
+  const query = `
+    SELECT 
+      p.id_producto,
+      p.producto,
+      p.descripcion,
+      p.precio,
+      p.costo,
+      p.id_categoria,
+      c.categoria,
+      p.material,
+      p.estado
+    FROM producto p
+    JOIN categoria c ON p.id_categoria = c.id_categoria
+    WHERE p.id_producto = ?
+    LIMIT 1
+  `;
+
+  try {
+    const [results] = await db.query(query, [id]);
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+    res.status(200).json(results[0]);
+  } catch (err) {
+    res.status(500).json({ error: "Error al obtener el producto" });
+  }
+};
+
+
 // Obtener el total en stock del producto
 exports.getProductoConTotalStock = async (req, res) => {
   const { id } = req.params;
