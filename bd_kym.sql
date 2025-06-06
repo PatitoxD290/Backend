@@ -225,7 +225,6 @@ END $$
 
 DELIMITER ;
 
--- Estructura de tabla para la tabla `producto`
 CREATE TABLE IF NOT EXISTS `producto` (
   `id_producto` INT(11) NOT NULL AUTO_INCREMENT,
   `producto` VARCHAR(100) NOT NULL,
@@ -234,6 +233,8 @@ CREATE TABLE IF NOT EXISTS `producto` (
   `costo` DECIMAL(10,2) NOT NULL,
   `id_categoria` INT(11) DEFAULT NULL,
   `material` VARCHAR(100) DEFAULT NULL,
+  `genero` ENUM('Mujer', 'Hombre') DEFAULT NULL,  -- Género del producto
+  `edad` ENUM('Niños', 'Adolescentes', 'Adultos') DEFAULT NULL,  -- Edad recomendada para el producto
   `estado` ENUM('Disponible','Agotado') DEFAULT 'Disponible',
   PRIMARY KEY (`id_producto`),
   FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id_categoria`)
@@ -253,6 +254,8 @@ BEGIN
     ('I', 'producto', NEW.id_producto, 'costo', NULL, CAST(NEW.costo AS CHAR), NOW()),
     ('I', 'producto', NEW.id_producto, 'id_categoria', NULL, CAST(NEW.id_categoria AS CHAR), NOW()),
     ('I', 'producto', NEW.id_producto, 'material', NULL, NEW.material, NOW()),
+    ('I', 'producto', NEW.id_producto, 'genero', NULL, NEW.genero, NOW()),  -- Registro del género
+    ('I', 'producto', NEW.id_producto, 'edad', NULL, NEW.edad, NOW()),  -- Registro de la edad
     ('I', 'producto', NEW.id_producto, 'estado', NULL, NEW.estado, NOW());
 END $$
 
@@ -268,6 +271,8 @@ BEGIN
     ('U', 'producto', OLD.id_producto, 'costo', CAST(OLD.costo AS CHAR), CAST(NEW.costo AS CHAR), NOW()),
     ('U', 'producto', OLD.id_producto, 'id_categoria', CAST(OLD.id_categoria AS CHAR), CAST(NEW.id_categoria AS CHAR), NOW()),
     ('U', 'producto', OLD.id_producto, 'material', OLD.material, NEW.material, NOW()),
+    ('U', 'producto', OLD.id_producto, 'genero', OLD.genero, NEW.genero, NOW()),  -- Actualización del género
+    ('U', 'producto', OLD.id_producto, 'edad', OLD.edad, NEW.edad, NOW()),  -- Actualización de la edad
     ('U', 'producto', OLD.id_producto, 'estado', OLD.estado, NEW.estado, NOW());
 END $$
 
@@ -283,23 +288,26 @@ BEGIN
     ('D', 'producto', OLD.id_producto, 'costo', CAST(OLD.costo AS CHAR), NULL, NOW()),
     ('D', 'producto', OLD.id_producto, 'id_categoria', CAST(OLD.id_categoria AS CHAR), NULL, NOW()),
     ('D', 'producto', OLD.id_producto, 'material', OLD.material, NULL, NOW()),
+    ('D', 'producto', OLD.id_producto, 'genero', OLD.genero, NULL, NOW()),  -- Eliminación del género
+    ('D', 'producto', OLD.id_producto, 'edad', OLD.edad, NULL, NOW()),  -- Eliminación de la edad
     ('D', 'producto', OLD.id_producto, 'estado', OLD.estado, NULL, NOW());
 END $$
 
 DELIMITER ;
 
-
 -- Insertar datos en `producto`
-INSERT INTO `producto` (`id_producto`, `producto`, `descripcion`, `precio`, `costo`, `id_categoria`, `material`, `estado`) VALUES
-(1, 'Short Deportivo', 'Ideal para entrenamientos y actividades físicas. Confeccionado en tela liviana, transpirable y de secado rápido para máxima comodidad.', 25.00, 20.00, 2, 'Algodón', 'Disponible'),
-(2, 'Polo Deportivo', 'Diseñado para el deporte y la movilidad. Hecho con materiales elásticos que permiten libertad de movimiento y absorción del sudor.', 35.00, 30.00, 2, 'Algodón', 'Disponible'),
-(3, 'Conjunto Deportivo', 'Conjunto completo de polo y short, perfecto para deportes o actividades escolares. Comodidad y estilo en una sola prenda.', 55.00, 50.00, 2, 'Algodón', 'Disponible'),
-(4, 'Short De Vestir', 'Corte moderno y elegante, perfecto para eventos formales o escolares. Tela resistente con acabado fino.', 22.00, 15.00, 4, 'Algodón', 'Disponible'),
-(5, 'Polo De Vestir', 'Estilo clásico para uniformes escolares o institucionales. Su tejido suave garantiza comodidad durante todo el día.', 30.00, 25.00, 4, 'Algodón', 'Disponible'),
-(6, 'Polo Estudiantil', 'Prenda básica para el uniforme escolar, con cuello clásico y costuras reforzadas. Resistente al uso diario y fácil de lavar.', 40.00, 30.00, 1, 'Algodón', 'Disponible'),
-(7, 'Camisa Estudiantil', 'Camisa formal para uniforme escolar. Corte estructurado y tela fresca, ideal para mantener una apariencia pulcra.', 45.00, 35.00, 1, 'Algodón', 'Disponible'),
-(8, 'Polo Personalizado', 'Polo personalizable con el logo o diseño de tu institución o evento. Disponible en varios colores, materiales y tallas.', 50.00, 40.00, 3, 'Algodón', 'Disponible'),
-(9, 'Vestido De Gala', 'Diseño elegante para eventos especiales o presentaciones. Confección fina y acabado detallado para un look distinguido.', 80.00, 70.00, 5, 'Algodón', 'Disponible');
+INSERT INTO `producto` 
+(`id_producto`, `producto`, `descripcion`, `precio`, `costo`, `id_categoria`, `material`, `genero`, `edad`, `estado`) 
+VALUES
+(1, 'Short Deportivo', 'Ideal para entrenamientos y actividades físicas. Confeccionado en tela liviana, transpirable y de secado rápido para máxima comodidad.', 25.00, 20.00, 2, 'Algodón', 'Hombre', 'Adolescentes', 'Disponible'),
+(2, 'Polo Deportivo', 'Diseñado para el deporte y la movilidad. Hecho con materiales elásticos que permiten libertad de movimiento y absorción del sudor.', 35.00, 30.00, 2, 'Algodón', 'Mujer', 'Adolescentes', 'Disponible'),
+(3, 'Conjunto Deportivo', 'Conjunto completo de polo y short, perfecto para deportes o actividades escolares. Comodidad y estilo en una sola prenda.', 55.00, 50.00, 2, 'Algodón', 'Hombre', 'Niños', 'Disponible'),
+(4, 'Short De Vestir', 'Corte moderno y elegante, perfecto para eventos formales o escolares. Tela resistente con acabado fino.', 22.00, 15.00, 4, 'Algodón', 'Hombre', 'Adultos', 'Disponible'),
+(5, 'Polo De Vestir', 'Estilo clásico para uniformes escolares o institucionales. Su tejido suave garantiza comodidad durante todo el día.', 30.00, 25.00, 4, 'Algodón', 'Mujer', 'Adultos', 'Disponible'),
+(6, 'Polo Estudiantil', 'Prenda básica para el uniforme escolar, con cuello clásico y costuras reforzadas. Resistente al uso diario y fácil de lavar.', 40.00, 30.00, 1, 'Algodón', 'Hombre', 'Niños', 'Disponible'),
+(7, 'Camisa Estudiantil', 'Camisa formal para uniforme escolar. Corte estructurado y tela fresca, ideal para mantener una apariencia pulcra.', 45.00, 35.00, 1, 'Algodón', 'Hombre', 'Adolescentes', 'Disponible'),
+(8, 'Polo Personalizado', 'Polo personalizable con el logo o diseño de tu institución o evento. Disponible en varios colores, materiales y tallas.', 50.00, 40.00, 3, 'Algodón', 'Mujer', 'Adultos', 'Disponible'),
+(9, 'Vestido De Gala', 'Diseño elegante para eventos especiales o presentaciones. Confección fina y acabado detallado para un look distinguido.', 80.00, 70.00, 5, 'Algodón', 'Mujer', 'Adultos', 'Disponible');
 
 -- Estructura de tabla para la tabla `stock`
 CREATE TABLE IF NOT EXISTS `stock` (
@@ -466,7 +474,7 @@ CREATE TABLE IF NOT EXISTS `contrato` (
   `descripcion` TEXT NOT NULL,
   `id_usuario` INT(11) DEFAULT NULL,
   `referencia_diseño` VARCHAR(50) DEFAULT NULL,
-  `estado` ENUM('Activo','Pendiente','Finalizado','Rechazado') DEFAULT NULL,
+  `estado` ENUM('Activo','Pendiente','Finalizado','Rechazado') NOT NULL DEFAULT 'Pendiente',
   `fecha_inicio` DATE NOT NULL,
   PRIMARY KEY (`id_contrato`),
   FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)

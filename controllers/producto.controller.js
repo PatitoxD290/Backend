@@ -2,19 +2,21 @@ const db = require("../config/database");
 
 // Crear producto
 exports.createProducto = async (req, res) => {
-  const { producto, descripcion, precio, costo, id_categoria, material, estado } = req.body;
+  const { producto, descripcion, precio, costo, id_categoria, material, estado, genero, edad } = req.body;
 
-  if (!producto || !descripcion || !precio || !costo || !id_categoria || !material || !estado) {
+  if (!producto || !descripcion || !precio || !costo || !id_categoria || !material || !estado || !genero || !edad) {
     return res.status(400).json({ error: "Todos los campos son obligatorios" });
   }
 
   const query = `
-    INSERT INTO producto (producto, descripcion, precio, costo, id_categoria, material, estado)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO producto (producto, descripcion, precio, costo, id_categoria, material, estado, genero, edad)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   try {
-    const [result] = await db.query(query, [producto, descripcion, precio, costo, id_categoria, material, estado]);
+    const [result] = await db.query(query, [
+      producto, descripcion, precio, costo, id_categoria, material, estado, genero, edad
+    ]);
     res.status(201).json({ message: "Producto agregado", id: result.insertId });
   } catch (err) {
     res.status(500).json({ error: "Error en la base de datos" });
@@ -24,16 +26,22 @@ exports.createProducto = async (req, res) => {
 // Actualizar producto
 exports.updateProducto = async (req, res) => {
   const { id } = req.params;
-  const { producto, descripcion, precio, costo, id_categoria, material, estado } = req.body;
+  const { producto, descripcion, precio, costo, id_categoria, material, estado, genero, edad } = req.body;
+
+  if (!producto || !descripcion || !precio || !costo || !id_categoria || !material || !estado || !genero || !edad) {
+    return res.status(400).json({ error: "Todos los campos son obligatorios" });
+  }
 
   const query = `
     UPDATE producto 
-    SET producto = ?, descripcion = ?, precio = ?, costo = ?, id_categoria = ?, material = ?, estado = ?
+    SET producto = ?, descripcion = ?, precio = ?, costo = ?, id_categoria = ?, material = ?, estado = ?, genero = ?, edad = ?
     WHERE id_producto = ?
   `;
 
   try {
-    await db.query(query, [producto, descripcion, precio, costo, id_categoria, material, estado, id]);
+    await db.query(query, [
+      producto, descripcion, precio, costo, id_categoria, material, estado, genero, edad, id
+    ]);
     res.status(200).json({ message: "Producto actualizado" });
   } catch (err) {
     res.status(500).json({ error: "Error en la base de datos" });
@@ -127,8 +135,21 @@ exports.getProductoConTotalStock = async (req, res) => {
   }
 };
 
-// Catálogo de productos
+// Catálogo de productos con filtros por género y edad
 exports.getCatalogoProductos = async (req, res) => {
+  const { genero, edad } = req.query;  // Recibiendo los parámetros desde la query string
+
+  // Construir la parte de la consulta para filtrar por género y edad (si están presentes)
+  let filterQuery = '';
+  
+  if (genero) {
+    filterQuery += ` AND p.genero = '${genero}'`;  // Filtro por género
+  }
+
+  if (edad) {
+    filterQuery += ` AND p.edad = '${edad}'`;  // Filtro por edad
+  }
+
   const query = `
     SELECT 
       p.id_producto,
@@ -137,9 +158,12 @@ exports.getCatalogoProductos = async (req, res) => {
       p.precio,
       p.material,
       c.categoria,
-      p.estado
+      p.estado,
+      p.genero,
+      p.edad
     FROM producto p
     JOIN categoria c ON p.id_categoria = c.id_categoria
+    WHERE 1=1 ${filterQuery}  -- Condición básica, con los filtros dinámicos
     ORDER BY p.producto
   `;
 
@@ -147,6 +171,8 @@ exports.getCatalogoProductos = async (req, res) => {
     const [results] = await db.query(query);
     res.status(200).json(results);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Error al obtener catálogo" });
   }
 };
+

@@ -65,13 +65,15 @@ exports.createVenta = async (req, res) => {
 // Obtener todas las ventas
 exports.getVentas = async (_req, res) => {
   try {
-    const [results] = await db.query("SELECT * FROM ventas");
+    // Suponiendo que hay una columna 'id' que es incremental y sirve para ordenar
+    const [results] = await db.query("SELECT * FROM ventas ORDER BY id_ventas DESC");
     res.status(200).json(results);
   } catch (err) {
     console.error("Error al obtener ventas:", err);
     res.status(500).json({ error: "Error en la base de datos" });
   }
 };
+
 
 // Obtener detalle de venta por ID ventas
 exports.getVentaDetalleById = async (req, res) => {
@@ -83,13 +85,14 @@ exports.getVentaDetalleById = async (req, res) => {
         SELECT 
           p.producto,
           vd.cantidad,
+          vd.tallas,
           ROW_NUMBER() OVER (ORDER BY vd.id_producto) AS numero
         FROM ventas_detalle vd
         JOIN producto p ON vd.id_producto = p.id_producto
         WHERE vd.id_ventas = ?
       )
       SELECT GROUP_CONCAT(
-        CONCAT('Producto ', numero, ': ', producto, '\nCantidad: ', cantidad)
+        CONCAT('Producto ', numero, ': ', producto, '\nCantidad: ', cantidad, '\nTallas: ', tallas)
         SEPARATOR '\n\n'
       ) AS detalles
       FROM numerados;
@@ -156,13 +159,35 @@ exports.obtenerProductosMasVendidos = async (_req, res) => {
   }
 };
 
-// Obtener todas las compras del usuario
-exports.getComprasUsuario = async (_req, res) => {
+exports.getComprasUsuario = async (req, res) => {
   try {
-    const [results] = await db.query("SELECT * FROM comprasusuario");
+    const idUsuario = req.params.id;
+
+    if (!idUsuario) {
+      return res.status(400).json({ error: "Falta el id_usuario" });
+    }
+
+    const [results] = await db.query(
+      `SELECT 
+        v.id_ventas,
+        u.user,
+        GROUP_CONCAT(p.producto SEPARATOR ', ') AS Productos,
+        v.total
+      FROM comprasusuario cu
+      INNER JOIN usuario u ON cu.id_usuario = u.id_usuario
+      INNER JOIN ventas v ON cu.id_ventas = v.id_ventas
+      INNER JOIN ventas_detalle vd ON v.id_ventas = vd.id_ventas
+      INNER join producto p ON p.id_producto = vd.id_producto
+      WHERE cu.id_usuario = ?
+      GROUP BY cu.id_comprasusuario, u.id_usuario, u.user, v.total
+      ORDER BY cu.id_comprasusuario DESC;`,
+      [idUsuario]
+    );
+
     res.status(200).json(results);
   } catch (err) {
     console.error("Error al obtener ventas:", err);
     res.status(500).json({ error: "Error en la base de datos" });
   }
 };
+
