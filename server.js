@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const path = require('path');
 
 // Obtengo mis rutas
 const authRoutes = require("./routes/auth.routes");
@@ -26,6 +27,8 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 };
+
+// Aplica la configuración CORS globalmente
 app.use(cors(corsOptions));
 
 // Validar variables de entorno requeridas
@@ -36,11 +39,6 @@ requiredEnvVars.forEach(envVar => {
     process.exit(1);
   }
 });
-
-app.use(cors({
-  origin: 'http://localhost:3000', // o el puerto de tu frontend
-  credentials: true
-}));
 
 app.use(express.json());
 
@@ -61,7 +59,19 @@ app.use("/api/v1", productoRoutes);
 app.use("/api/v1", contratoRoutes);
 app.use("/api/v1", stockRoutes);
 app.use("/api/v1", logsRoutes);
-app.use("/api/v1", millerRoutes); 
+app.use("/api/v1", millerRoutes);
+
+// Ruta para archivos estáticos (imagenes, PDFs, etc.) en /catalogo
+app.use('/cata', express.static(path.join(__dirname, 'catalogo')));
+
+// Rutas CORS específicamente para las imágenes en /cata
+app.use('/cata', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  next();
+}, express.static(path.join(__dirname, 'catalogo')));
 
 // Manejo de rutas no encontradas
 app.use((_req, res) => {

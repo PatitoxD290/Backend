@@ -5,7 +5,7 @@ const { verifyToken } = require("../middlewares/auth.middleware");
 
 // Ruta para crear contrato
 // Aquí se utiliza `upload.single('referencia_diseño')` en el controlador
-router.post("/contratos", verifyToken, contratoController.createContrato);
+router.post("/contratos", contratoController.createContrato);
 
 // Ruta para obtener todos los contratos
 router.get("/contratos", verifyToken, contratoController.getContratos);

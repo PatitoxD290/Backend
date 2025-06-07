@@ -473,7 +473,7 @@ CREATE TABLE IF NOT EXISTS `contrato` (
   `id_contrato` INT(11) NOT NULL AUTO_INCREMENT,
   `descripcion` TEXT NOT NULL,
   `id_usuario` INT(11) DEFAULT NULL,
-  `referencia_diseño` VARCHAR(50) DEFAULT NULL,
+  `referencia_diseño` VARCHAR(1000) DEFAULT NULL,
   `estado` ENUM('Activo','Pendiente','Finalizado','Rechazado') NOT NULL DEFAULT 'Pendiente',
   `fecha_inicio` DATE NOT NULL,
   PRIMARY KEY (`id_contrato`),

@@ -36,11 +36,11 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configuración de Multer
+// Configuración de Multer para aceptar múltiples archivos
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 } // Limitar el tamaño a 10 MB por archivo
-});
+  limits: { fileSize: 10 * 1024 * 1024 }, // Limitar el tamaño a 10 MB por archivo
+}).array("referencia", 3); // Aquí '5' es el número máximo de archivos
 
 module.exports = upload;
