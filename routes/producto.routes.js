@@ -8,8 +8,8 @@ router.post("/productos", verifyToken, productoController.createProducto);
 router.put("/productos/:id", verifyToken, productoController.updateProducto);
 
 // Obtener todos los productos y por ID
-router.get("/productos", verifyToken, productoController.getAllProductos);
-router.get("/productos/:id", verifyToken, productoController.getProductoById);
+router.get("/productos",  productoController.getAllProductos);
+router.get("/productos/:id",  productoController.getProductoById);
 
 // Obtener stock total por producto
 router.get("/productos-stock/:id", verifyToken, productoController.getProductoConTotalStock);

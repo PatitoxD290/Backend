@@ -7,13 +7,13 @@ const { verifyToken } = require("../middlewares/auth.middleware");
 router.post("/clientes", verifyToken, clienteController.createOrUpdateCliente);
 
 // Obtener todos los clientes
-router.get("/clientes", verifyToken, clienteController.getClientes);
+router.get("/clientes", clienteController.getClientes);
 
 // Actualizar cliente directamente por ID (admin u otro caso)
 router.put("/clientes/:id", verifyToken, clienteController.updateCliente);
 
 // Contratos
-router.get("/contratos", verifyToken, clienteController.listarTodosContratos);
+router.get("/contratos", clienteController.listarTodosContratos);
 
 // Datos de boleta del cliente
 router.get("/clientes-boleta/:id", clienteController.datosBoletaCliente);

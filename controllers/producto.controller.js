@@ -35,7 +35,7 @@ exports.createProducto = [
       // Si se subió un archivo, renombrarlo usando el ID del producto
       if (req.file) {
         const extension = path.extname(req.file.originalname); // Obtener la extensión original
-        const nuevoNombre = `imagen=${idProducto}${extension}`; // Crear el nuevo nombre del archivo
+        const nuevoNombre = `ID_Producto_${idProducto}${extension}`; // Crear el nuevo nombre del archivo
 
         // Renombrar el archivo en el sistema de archivos
         const oldPath = path.join(req.file.destination, req.file.filename); // Ruta original del archivo

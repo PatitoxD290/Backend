@@ -4,7 +4,6 @@ const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
 
-// Obtengo mis rutas
 const authRoutes = require("./routes/auth.routes");
 const usuarioRoutes = require("./routes/usuario.routes");
 const clienteRoutes = require("./routes/cliente.routes");
@@ -17,21 +16,19 @@ const millerRoutes = require("./routes/miller.routes.js");
 
 const app = express();
 
-// Configuración de seguridad
+// Seguridad
 app.use(helmet());
 
-// Configuración CORS más estricta
+// CORS
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 };
-
-// Aplica la configuración CORS globalmente
 app.use(cors(corsOptions));
 
-// Validar variables de entorno requeridas
+// Validación de variables
 const requiredEnvVars = ['JWT_SECRET', 'DB_HOST', 'DB_USER', 'DB_NAME'];
 requiredEnvVars.forEach(envVar => {
   if (!process.env[envVar]) {
@@ -42,15 +39,12 @@ requiredEnvVars.forEach(envVar => {
 
 app.use(express.json());
 
-// Ruta default
+// Ruta base
 app.get("/", (_req, res) => {
-  res.json({
-    message: "BACKEND KYM",
-    version: "15.9.85"
-  });
+  res.json({ message: "BACKEND KYM", version: "15.9.85" });
 });
 
-// Rutas
+// Rutas API
 app.use("/api/v1", authRoutes);
 app.use("/api/v1", usuarioRoutes);
 app.use("/api/v1", clienteRoutes);
@@ -61,23 +55,31 @@ app.use("/api/v1", stockRoutes);
 app.use("/api/v1", logsRoutes);
 app.use("/api/v1", millerRoutes);
 
-// Ruta para archivos estáticos (imagenes, PDFs, etc.) en /catalogo
-app.use('/cata', express.static(path.join(__dirname, 'catalogo')));
-
-// Rutas CORS específicamente para las imágenes en /cata
+// 🔥 Rutas para servir imágenes con encabezados seguros
 app.use('/cata', (req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:5173');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); // 🔥 ESTE ES EL QUE FALTABA
   next();
 }, express.static(path.join(__dirname, 'catalogo')));
 
-// Manejo de rutas no encontradas
+app.use('/imgrefe', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:5173');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); // 🔥 ESTE ES EL QUE FALTABA
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
+
+// Ruta 404
 app.use((_req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
+// Puerto
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT} 🥵`);

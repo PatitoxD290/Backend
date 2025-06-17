@@ -9,8 +9,8 @@ router.post("/register", usuarioController.createUsuario);
 router.post("/recuperar-contrase", usuarioController.recuperarContraseña);
 
 // Usuarios
-router.get("/usuarios", verifyToken, usuarioController.getUsuarios);
-router.get("/usuarios/:id", verifyToken, usuarioController.getUsuarioByCorreo);
+router.get("/usuarios",  usuarioController.getUsuarios);
+router.get("/usuarios/:id",  usuarioController.getUsuarioByCorreo);
 router.put("/usuarios/:id", verifyToken, usuarioController.updateUsuario);
 
 

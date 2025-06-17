@@ -41,13 +41,15 @@ exports.createContrato = [
 ];
 
 
-// Obtener contratos
-exports.getContratos = async (_req, res) => {
+
+//Aceptar contratos
+exports.aceptarContrato = async (req, res) => {
+  const { id } = req.params;
   try {
-    const results = await db.query("SELECT * FROM contrato");
-    res.status(200).json(results);
+    await db.query("UPDATE contrato SET estado = 'Aceptado' WHERE id_contrato = ?", [id]);
+    res.json({ mensaje: "Contrato aceptado correctamente" });
   } catch (err) {
-    res.status(500).json({ error: "Error en la base de datos" });
+    res.status(500).json({ error: "Error al aceptar contrato" });
   }
 };
 

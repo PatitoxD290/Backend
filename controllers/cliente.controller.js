@@ -72,17 +72,20 @@ exports.createOrUpdateCliente = async (req, res) => {
 
 // Listar todos los contratos
 exports.listarTodosContratos = async (_req, res) => {
-  const sql = `
-    SELECT 
-      c.ID_Contrato,
-      CONCAT(cl.nombres, ' ', cl.apellidos) AS Nombre_Completo,
-      cl.telefono,
-      c.Contrato,
-      c.Estado
-    FROM 
-      Contratos c
-    INNER JOIN 
-      cliente cl ON c.ID_Cliente = cl.id_cliente
+  const sql = `SELECT 
+    c.id_contrato,
+    CONCAT(cl.nombres, ' ', cl.apellidos) AS Nombre_Completo,
+    c.descripcion,
+    c.id_usuario,
+    c.referencia_diseño,
+    c.estado,
+    c.fecha_inicio
+  FROM 
+    contrato c
+  INNER JOIN 
+    usuario u ON c.ID_Usuario = u.id_usuario
+  INNER JOIN 
+    cliente cl ON u.id_cliente = cl.id_cliente;
   `;
 
   try {
@@ -92,6 +95,7 @@ exports.listarTodosContratos = async (_req, res) => {
     res.status(500).json({ error: "Error al listar contratos" });
   }
 };
+
 
 // Obtener datos para boleta
 exports.datosBoletaCliente = async (req, res) => {

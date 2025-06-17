@@ -7,10 +7,10 @@ const { verifyToken } = require("../middlewares/auth.middleware");
 // Aquí se utiliza `upload.single('referencia_diseño')` en el controlador
 router.post("/contratos", contratoController.createContrato);
 
-// Ruta para obtener todos los contratos
-router.get("/contratos", verifyToken, contratoController.getContratos);
-
 // Ruta para actualizar el estado de un contrato
-router.put("/contratos/:id", verifyToken, contratoController.updateContrato);
+router.put("/contratos/:id", contratoController.updateContrato);
+
+//Aceptar contratos
+router.put("/contratos/:id/aceptar", contratoController.aceptarContrato);
 
 module.exports = router;
